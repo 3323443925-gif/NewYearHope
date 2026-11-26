@@ -1,0 +1,159 @@
+{
+  "brand": {
+    "name": "星屿祈光",
+    "subtitle": "给未说出口的话，和新年愿望的一座光屿",
+    "countdownDays": "距 2027 新年还有 {days} 天",
+    "newYearEve": "今晚，迎接 2027 零点烟花",
+    "newYearDay": "2027 新年快乐 · 愿你所愿皆成真",
+    "eternalWhisper": "孤独时，这座夜空小岛一直为你亮着"
+  },
+  "hud": {
+    "lightLantern": "放飞一盏灯",
+    "refreshSky": "换一批夜空",
+    "catchLight": "随机拆一盏灯",
+    "myLanterns": "我的灯",
+    "liteMode": "省电模式",
+    "mode3d": "3D 星夜",
+    "about": "关于与开源",
+    "soundOn": "开启冬夜声景",
+    "soundOff": "关闭声景",
+    "dragHint": "拖动旋转小岛 · 点击星灯阅读与问好 · 点击雪地礼花筒看 0 点倒计时",
+    "fireworkCountdownTitle": "本地 0 点烟花倒计时",
+    "fireworkCountdownDesc": "引线正随你的当地时间缓慢燃烧，每日 00:00 燃尽升空，绽放满天璀璨烟花。",
+    "previewFirework": "点亮璀璨烟花秀",
+    "refreshedSkyToast": "已为你点亮一片新的夜空星灯 ✨",
+    "loadingSky": "正在点亮冬夜星光…"
+  },
+  "types": {
+    "wish": "新年愿望",
+    "unspoken": "未说出口的话",
+    "greeting": "向世界问好"
+  },
+  "typeHints": {
+    "wish": "化作一盏暖橘孔明灯缓缓升空",
+    "unspoken": "化作一颗月白星愿球安静环绕",
+    "greeting": "化作一缕琥珀星尘向旅人致意"
+  },
+  "moods": {
+    "hopeful": "满怀期待",
+    "missing": "轻轻想念",
+    "relieved": "释怀告别",
+    "lonely": "有点孤单",
+    "grateful": "心怀感恩",
+    "encouraging": "给自己加油"
+  },
+  "compose": {
+    "title": "放飞一盏属于你的星灯",
+    "subtitle": "无需注册，写下真实的愿望或心事，交给这片温柔的夜空。",
+    "typeLabel": "选择星灯形态",
+    "moodLabel": "此刻的心情",
+    "contentLabel": "想留下的话",
+    "contentPlaceholder": "写下一句未能说出口的话、2027 年的愿望，或给陌生人的一声问好…",
+    "nicknameLabel": "署名（选填）",
+    "nicknamePlaceholder": "留空将显示为「匿名旅人」",
+    "stickerLabel": "附上一枚治愈贴纸（选填）",
+    "noSticker": "不选",
+    "imageLabel": "附上一张照片（选填，自动压缩并清除定位隐私）",
+    "imagePick": "选择照片",
+    "imageCompressing": "正在轻量化处理并清除隐私信息…",
+    "imageReady": "已压缩为 WebP（{size} KB）",
+    "imageRemove": "移除图片",
+    "allowRepliesTitle": "允许陌生人留言安慰与问好",
+    "allowRepliesDesc": "关闭后仅接收「点亮祝福」，不显示文字回复框。",
+    "submit": "点亮并放飞",
+    "submitting": "正在放飞星灯…",
+    "successToast": "你的光已升入夜空 ✨",
+    "anonymous": "匿名旅人"
+  },
+  "detail": {
+    "blessWish": "祝你如愿",
+    "blessHug": "抱抱你",
+    "blessNewyear": "新年好",
+    "blessed": "已送出这份祝福",
+    "repliesTitle": "陌生人的温暖回信（{count}）",
+    "repliesEmpty": "还没有人回复这盏灯，做第一个向 TA 问好的人吧。",
+    "repliesClosed": "这盏灯的主人选择静静珍藏心事，你可以为 TA 点亮一份祝福 ✨",
+    "replyPlaceholder": "写一句温柔的安慰、解答或新年问好…",
+    "replyNicknamePlaceholder": "你的昵称（选填）",
+    "replySubmit": "寄出回信",
+    "replySubmitting": "正在寄出…",
+    "replySuccess": "你的善意已抵达这盏星灯 🤍",
+    "report": "举报",
+    "reportTitle": "守护夜空纯净",
+    "reportDesc": "如果这条内容包含广告、恶意攻击或不适图片，感谢告诉我们。",
+    "reportReasons": {
+      "spam": "广告 / 引流刷屏",
+      "unkind": "不友善 / 恶意攻击",
+      "inappropriate_image": "不当图片",
+      "other": "其他问题"
+    },
+    "reportSubmit": "提交举报",
+    "reportSuccess": "已收到你的反馈，谢谢你一起守护这里。",
+    "retract": "收回这盏灯",
+    "retractConfirmTitle": "要轻轻熄灭这盏灯吗？",
+    "retractConfirmDesc": "收回后，这盏灯与上面的文字和照片将从夜空消失且无法恢复。",
+    "retractConfirmBtn": "确认收回",
+    "retractCancelBtn": "再留一会儿",
+    "retractSuccess": "这盏灯已轻轻收回。",
+    "mineBadge": "我的星灯",
+    "close": "关闭"
+  },
+  "myLanterns": {
+    "title": "我放飞的星灯",
+    "empty": "你还没有在这台设备上放飞过星灯。点击底部按钮，点亮属于你的第一束光吧。",
+    "newReplies": "+{count} 条新回信",
+    "locate": "打开阅读",
+    "storageNote": "记录保存在当前浏览器本地，清除浏览器数据后将无法找回自主收回权限。"
+  },
+  "crisis": {
+    "title": "你并不孤单，有人愿意认真倾听你",
+    "desc": "我们感受到你此刻可能正承受着很重的痛苦。这片夜空很欢迎你，也希望你在现实中能得到真实、专业、温暖的陪伴：",
+    "hotlines": [
+      {
+        "region": "中国大陆（24 小时免费）",
+        "name": "希望 24 热线 / 心理援助热线",
+        "contact": "400-161-9995 / 12356（全国统一心理援助热线）"
+      },
+      {
+        "region": "中国台湾 / 香港",
+        "name": "安心专线 / 撒玛利亚防止自杀会",
+        "contact": "1925（台湾）/ 2389 2222（香港）"
+      },
+      {
+        "region": "美国 / 加拿大 / 国际",
+        "name": "988 Lifeline / Find A Helpline",
+        "contact": "拨打或短信 988 · findahelpline.com"
+      }
+    ],
+    "continueNotice": "你的留言已安放在夜空里，请一定好好照顾自己 🤍",
+    "closeBtn": "我知道了，谢谢你"
+  },
+  "about": {
+    "title": "关于 · 星屿祈光",
+    "body1": "「星屿祈光 · Starlight Isle」诞生于 2027 年到来之前，是一座以“真、善、美”为初心的冬夜浮岛。在这里，你可以写下未能说出口的话、对新年的希望，或给素未谋面的陌生人道一声晚安。",
+    "body2": "过了 1 月份之后，这座岛依然会一直亮着。当你感到孤单时，随时欢迎回来坐一坐，看一眼每晚本地 0 点如约升空的烟花。",
+    "valuesTitle": "我们的承诺",
+    "values": [
+      "免登录与隐私保护：不收集手机号与邮箱，照片在上传前自动剥离定位（EXIF）信息。",
+      "温和守护：通过智能过滤、社区举报与人工复核，拒绝广告与恶意言论。",
+      "开放共建：本项目采用 MIT 开源协议，欢迎全球创作者在 GitHub 一起延续这份温暖。"
+    ],
+    "adminLink": "管理员守护后台",
+    "close": "回到夜空"
+  },
+  "errors": {
+    "moderationBlocked": "为了让这片夜空保持温柔与纯净，请稍微调整一下内容后再试哦。",
+    "imageBlocked": "这张图片未能通过安全校验，请换一张温暖清晰的照片吧。",
+    "rateLimited": "放飞太快啦，深呼吸一下，稍后再点亮下一盏灯吧。",
+    "networkError": "夜空信号有点波动，请稍后再试。",
+    "contentRequired": "先写下一点想说的话吧（1~500 字）。",
+    "replyRequired": "先写下一句问好或安慰吧（1~300 字）。",
+    "imageTooLarge": "图片体积过大，请选择 15MB 以内的照片。"
+  },
+  "time": {
+    "justNow": "刚刚",
+    "minutesAgo": "{n} 分钟前",
+    "hoursAgo": "{n} 小时前",
+    "daysAgo": "{n} 天前"
+  }
+}

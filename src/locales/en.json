@@ -1,0 +1,159 @@
+{
+  "brand": {
+    "name": "Starlight Isle",
+    "subtitle": "A quiet island for unspoken words & new year wishes",
+    "countdownDays": "{days} days until 2027",
+    "newYearEve": "Tonight, we welcome 2027 with midnight fireworks",
+    "newYearDay": "Happy New Year 2027 · May your wishes shine",
+    "eternalWhisper": "Whenever you feel lonely, this island keeps a light on for you"
+  },
+  "hud": {
+    "lightLantern": "Light a Lantern",
+    "refreshSky": "Refresh Sky",
+    "catchLight": "Catch a Light",
+    "myLanterns": "My Lanterns",
+    "liteMode": "Lite Mode",
+    "mode3d": "3D Sky",
+    "about": "About & OSS",
+    "soundOn": "Turn on winter soundscape",
+    "soundOff": "Mute soundscape",
+    "dragHint": "Drag to orbit · Tap a lantern to read & greet · Tap the firework cannon for midnight countdown",
+    "fireworkCountdownTitle": "Local Midnight Fireworks",
+    "fireworkCountdownDesc": "The fuse burns slowly with your local clock and fills the sky with grand fireworks every night at 00:00.",
+    "previewFirework": "Launch Fireworks Preview",
+    "refreshedSkyToast": "A fresh constellation of lanterns has risen ✨",
+    "loadingSky": "Lighting up the winter sky…"
+  },
+  "types": {
+    "wish": "New Year Wish",
+    "unspoken": "Unspoken Words",
+    "greeting": "Warm Greeting"
+  },
+  "typeHints": {
+    "wish": "Rises gently as a warm amber sky lantern",
+    "unspoken": "Orbits softly as a moonlight wish orb",
+    "greeting": "Drifts as a gentle starlight greeting"
+  },
+  "moods": {
+    "hopeful": "Hopeful",
+    "missing": "Missing Someone",
+    "relieved": "Letting Go",
+    "lonely": "Feeling Lonely",
+    "grateful": "Grateful",
+    "encouraging": "Cheering Myself On"
+  },
+  "compose": {
+    "title": "Send a Lantern into the Night",
+    "subtitle": "No sign-up needed. Leave your honest words or wishes with this gentle sky.",
+    "typeLabel": "Lantern Form",
+    "moodLabel": "How you feel right now",
+    "contentLabel": "Your message",
+    "contentPlaceholder": "Write unspoken words, a hope for 2027, or a warm greeting to a stranger…",
+    "nicknameLabel": "Nickname (optional)",
+    "nicknamePlaceholder": "Leave blank for \"Anonymous Traveler\"",
+    "stickerLabel": "Add a healing sticker (optional)",
+    "noSticker": "None",
+    "imageLabel": "Attach a photo (optional · auto-compressed & EXIF stripped)",
+    "imagePick": "Choose photo",
+    "imageCompressing": "Optimizing & stripping privacy metadata…",
+    "imageReady": "Ready as WebP ({size} KB)",
+    "imageRemove": "Remove",
+    "allowRepliesTitle": "Allow strangers to leave comforting replies",
+    "allowRepliesDesc": "If turned off, visitors can still send gentle light blessings without text replies.",
+    "submit": "Light & Release",
+    "submitting": "Releasing into the sky…",
+    "successToast": "Your light has risen into the night sky ✨",
+    "anonymous": "Anonymous Traveler"
+  },
+  "detail": {
+    "blessWish": "May it come true",
+    "blessHug": "Sending a hug",
+    "blessNewyear": "Happy New Year",
+    "blessed": "Blessing sent",
+    "repliesTitle": "Warm Replies ({count})",
+    "repliesEmpty": "No replies yet. Be the first gentle soul to say hello.",
+    "repliesClosed": "The keeper of this lantern chose to keep it quiet. You can still light a blessing above ✨",
+    "replyPlaceholder": "Leave a kind word, comfort, or New Year greeting…",
+    "replyNicknamePlaceholder": "Your nickname (optional)",
+    "replySubmit": "Send Reply",
+    "replySubmitting": "Sending…",
+    "replySuccess": "Your kindness has reached this lantern 🤍",
+    "report": "Report",
+    "reportTitle": "Keep the Sky Gentle",
+    "reportDesc": "Thank you for helping protect this space from spam, unkindness, or unsafe images.",
+    "reportReasons": {
+      "spam": "Spam / Promotion",
+      "unkind": "Unkind / Harassment",
+      "inappropriate_image": "Inappropriate Image",
+      "other": "Other"
+    },
+    "reportSubmit": "Submit Report",
+    "reportSuccess": "Thank you. We have received your report.",
+    "retract": "Retract Lantern",
+    "retractConfirmTitle": "Gently extinguish this lantern?",
+    "retractConfirmDesc": "Once retracted, this lantern and its photo will disappear from the sky permanently.",
+    "retractConfirmBtn": "Confirm Retract",
+    "retractCancelBtn": "Keep it lit",
+    "retractSuccess": "Your lantern has been gently retracted.",
+    "mineBadge": "My Lantern",
+    "close": "Close"
+  },
+  "myLanterns": {
+    "title": "My Lanterns",
+    "empty": "You haven't released any lanterns on this device yet. Tap the button below to light your first one.",
+    "newReplies": "+{count} new",
+    "locate": "Open Letter",
+    "storageNote": "Saved locally in this browser. Clearing browser storage will remove retraction access."
+  },
+  "crisis": {
+    "title": "You are not alone — someone wants to listen",
+    "desc": "It sounds like you may be carrying something very heavy right now. You are always welcome here, and free, confidential human support is also available:",
+    "hotlines": [
+      {
+        "region": "Global Directory",
+        "name": "Find A Helpline (Free & Confidential)",
+        "contact": "findahelpline.com"
+      },
+      {
+        "region": "US & Canada (24/7)",
+        "name": "988 Suicide & Crisis Lifeline",
+        "contact": "Call or text 988"
+      },
+      {
+        "region": "Mainland China (24/7)",
+        "name": "National Mental Health & Hope 24 Hotline",
+        "contact": "12356 / 400-161-9995"
+      }
+    ],
+    "continueNotice": "Your lantern has been gently placed in the sky. Please take good care of yourself 🤍",
+    "closeBtn": "Thank you, I understand"
+  },
+  "about": {
+    "title": "About · Starlight Isle",
+    "body1": "Born before the arrival of 2027, Starlight Isle is a quiet winter island built on Truth, Goodness, and Beauty. Leave unspoken words, new year wishes, or say hello to someone across the world.",
+    "body2": "Even long after January passes, this island stays open forever—so whenever loneliness visits, you can come back and watch the midnight fireworks rise with your local clock.",
+    "valuesTitle": "Our Promise",
+    "values": [
+      "Zero sign-up & privacy first: no email or phone required; uploaded photos automatically strip EXIF location metadata.",
+      "Gentle moderation: bilingual safety filters, community reporting, and human review keep the night sky kind.",
+      "Open Source (MIT): welcome global contributors on GitHub to carry this warmth forward."
+    ],
+    "adminLink": "Guardian Admin Panel",
+    "close": "Return to Sky"
+  },
+  "errors": {
+    "moderationBlocked": "To keep this night sky gentle and kind, please soften your wording and try again.",
+    "imageBlocked": "This photo could not pass our safety check. Please choose another gentle image.",
+    "rateLimited": "Take a slow breath—please wait a moment before sending another light.",
+    "networkError": "The night sky signal wavered. Please try again in a moment.",
+    "contentRequired": "Please write a few words first (1–500 characters).",
+    "replyRequired": "Please write a short greeting or reply (1–300 characters).",
+    "imageTooLarge": "Please pick an image smaller than 15MB."
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago"
+  }
+}

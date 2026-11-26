@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: radial-gradient(circle at 50% 38%, #102452 0%, #07122b 52%, #030714 100%);
+  color: #f1f5f9;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Instant SSR starry sky ambient layer (guarantees zero white flash & <1.2s FCP) */
+.starlight-backdrop {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1.5px 1.5px at 28% 34%, rgba(255, 224, 155, 0.7), transparent),
+    radial-gradient(1px 1px at 74% 22%, rgba(190, 220, 255, 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 85% 40%, rgba(255, 240, 200, 0.75), transparent),
+    radial-gradient(1px 1px at 62% 12%, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(1.2px 1.2px at 42% 16%, rgba(210, 232, 255, 0.7), transparent),
+    radial-gradient(circle at 50% 42%, #112656 0%, #07122b 52%, #030714 100%);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Elegant serif for the brand mark and the letters people leave (graceful fallback, no web-font download) */
+.font-brand {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", Georgia,
+    "Times New Roman", serif;
+}
+
+.font-letter {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, ui-serif, serif;
+  letter-spacing: 0.02em;
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.intro-rise {
+  animation: intro-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-rise {
+    animation: none;
+  }
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 217, 132, 0.25);
+  border-radius: 999px;
+}
