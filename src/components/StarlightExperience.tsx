@@ -4,11 +4,18 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic';
 import {
   Bookmark,
+  ChevronDown,
   Flame,
   Globe,
   Info,
+  ListMusic,
+  Music2,
   RefreshCw,
+  Repeat,
+  Repeat1,
   Shuffle,
+  SkipBack,
+  SkipForward,
   Sparkles,
   Volume2,
   VolumeX,
@@ -38,7 +45,7 @@ import LanternDetailModal from './LanternDetailModal';
 import MyLanternsDrawer from './MyLanternsDrawer';
 import CrisisSupportModal from './CrisisSupportModal';
 import AboutModal from './AboutModal';
-import { ambientAudio } from '@/lib/ambientAudio';
+import { ambientAudio, type PlayMode, type PlaylistTrack } from '@/lib/ambientAudio';
 
 const INTRO_SEEN_KEY = 'starlight_intro_seen_v1';
 
@@ -69,9 +76,20 @@ export default function StarlightExperience() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [crisisOpen, setCrisisOpen] = useState(false);
   const [cannonPopoverOpen, setCannonPopoverOpen] = useState(false);
+  const [musicPopoverOpen, setMusicPopoverOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [soundOn, setSoundOn] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
+  const [audioNeedsGesture, setAudioNeedsGesture] = useState(false);
+  const [playlist, setPlaylist] = useState<PlaylistTrack[]>(
+    () => ambientAudio.getSnapshot().tracks
+  );
+  const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(
+    () => ambientAudio.getSnapshot().trackIndex
+  );
+  const [playMode, setPlayMode] = useState<PlayMode>(
+    () => ambientAudio.getSnapshot().playMode
+  );
   const [introPhase, setIntroPhase] = useState<'show' | 'fade' | 'done'>('show');
 
   const sceneRef = useRef<SceneCanvasHandle | null>(null);
@@ -273,14 +291,118 @@ export default function StarlightExperience() {
     setMyLanterns((prev) => prev.filter((l) => l.id !== id));
   };
 
+  // Default-on audio: start soundscape + rotating public/ playlist immediately on every load,
+  // and unlock synchronously on the first user gesture if browser autoplay policy blocks it.
+  useEffect(() => {
+    let active = true;
+
+    const syncSnapshot = () => {
+      if (!active) return;
+      const snap = ambientAudio.getSnapshot();
+      setSoundOn(snap.enabled);
+      setAudioNeedsGesture(snap.needsGesture);
+      setPlaylist(snap.tracks);
+      setCurrentTrackIndex(snap.trackIndex);
+      setPlayMode(snap.playMode);
+    };
+
+    const unsubscribe = ambientAudio.subscribe(syncSnapshot);
+
+    const removeGestureListeners = () => {
+      window.removeEventListener('pointerdown', handleFirstGesture, true);
+      window.removeEventListener('click', handleFirstGesture, true);
+      window.removeEventListener('keydown', handleFirstGesture, true);
+      window.removeEventListener('touchstart', handleFirstGesture, true);
+    };
+
+    const handleFirstGesture = (ev: Event) => {
+      const target = ev.target as HTMLElement | null;
+      if (target?.closest('[data-sound-toggle="true"]')) return;
+      void ambientAudio.unlockFromGesture().then((started) => {
+        if (started) {
+          removeGestureListeners();
+        }
+      });
+    };
+
+    // Arm gesture listeners immediately so even an early tap/drag unlocks audio synchronously
+    window.addEventListener('pointerdown', handleFirstGesture, true);
+    window.addEventListener('click', handleFirstGesture, true);
+    window.addEventListener('keydown', handleFirstGesture, true);
+    window.addEventListener('touchstart', handleFirstGesture, true);
+
+    // Start immediately without waiting for network
+    void ambientAudio.enable().then((started) => {
+      if (!active) return;
+      syncSnapshot();
+      if (started) {
+        removeGestureListeners();
+      }
+    });
+
+    // Dynamically discover any songs placed inside /public
+    void fetch('/api/playlist', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { tracks?: PlaylistTrack[] } | null) => {
+        if (active && data?.tracks && data.tracks.length > 0) {
+          ambientAudio.setTracks(data.tracks);
+          syncSnapshot();
+        }
+      })
+      .catch(() => {
+        // Keep built-in default playlist tracks
+      });
+
+    return () => {
+      active = false;
+      unsubscribe();
+      removeGestureListeners();
+      ambientAudio.disable();
+    };
+  }, []);
+
+  const currentTrackTitle = playlist[currentTrackIndex]?.title ?? '';
+
   const toggleSound = async () => {
-    if (soundOn) {
+    if (soundOn && !audioNeedsGesture) {
       ambientAudio.disable();
       setSoundOn(false);
+      setAudioNeedsGesture(false);
     } else {
-      const ok = await ambientAudio.enable();
-      setSoundOn(ok);
+      await ambientAudio.enable();
+      const snap = ambientAudio.getSnapshot();
+      setSoundOn(snap.enabled);
+      setAudioNeedsGesture(snap.needsGesture);
     }
+  };
+
+  const handleSelectTrack = async (index: number) => {
+    await ambientAudio.selectTrack(index);
+    const snap = ambientAudio.getSnapshot();
+    setSoundOn(snap.enabled);
+    setAudioNeedsGesture(snap.needsGesture);
+    setCurrentTrackIndex(snap.trackIndex);
+  };
+
+  const handleNextTrack = async () => {
+    await ambientAudio.nextTrack();
+    const snap = ambientAudio.getSnapshot();
+    setSoundOn(snap.enabled);
+    setAudioNeedsGesture(snap.needsGesture);
+    setCurrentTrackIndex(snap.trackIndex);
+  };
+
+  const handlePrevTrack = async () => {
+    await ambientAudio.prevTrack();
+    const snap = ambientAudio.getSnapshot();
+    setSoundOn(snap.enabled);
+    setAudioNeedsGesture(snap.needsGesture);
+    setCurrentTrackIndex(snap.trackIndex);
+  };
+
+  const handleCyclePlayMode = () => {
+    const next = ambientAudio.cyclePlayMode();
+    setPlayMode(next);
   };
 
   const handlePreviewFirework = () => {
@@ -364,7 +486,10 @@ export default function StarlightExperience() {
         <div className="pointer-events-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
           <button
             type="button"
-            onClick={() => setCannonPopoverOpen((o) => !o)}
+            onClick={() => {
+              setMusicPopoverOpen(false);
+              setCannonPopoverOpen((o) => !o);
+            }}
             className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/25 bg-[#07122b]/60 px-3 py-2 text-xs text-amber-100 backdrop-blur-md transition hover:border-amber-300/50 hover:bg-[#0b1b42]/80"
             title={dict.hud.fireworkCountdownTitle}
           >
@@ -386,19 +511,66 @@ export default function StarlightExperience() {
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={toggleSound}
-            className={`inline-flex items-center justify-center rounded-full border p-2 backdrop-blur-md transition ${
+          {/* Sound Toggle + Song Selector Controls */}
+          <div
+            className={`inline-flex items-center rounded-full border backdrop-blur-md transition ${
               soundOn
-                ? 'border-amber-300/50 bg-amber-300/15 text-amber-100'
+                ? 'border-amber-300/45 bg-amber-300/12 text-amber-100'
                 : 'border-white/15 bg-[#07122b]/60 text-slate-300 hover:border-amber-200/40 hover:text-white'
             }`}
-            aria-label={soundOn ? dict.hud.soundOff : dict.hud.soundOn}
-            title={soundOn ? dict.hud.soundOff : dict.hud.soundOn}
           >
-            {soundOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          </button>
+            <button
+              type="button"
+              data-sound-toggle="true"
+              onClick={toggleSound}
+              className="relative inline-flex items-center justify-center rounded-full p-2 transition hover:text-amber-50"
+              aria-label={
+                soundOn && !audioNeedsGesture
+                  ? dict.hud.soundOff
+                  : dict.hud.soundOn
+              }
+              title={
+                audioNeedsGesture
+                  ? dict.hud.tapForSound
+                  : soundOn
+                  ? dict.hud.soundOff
+                  : dict.hud.soundOn
+              }
+            >
+              {soundOn ? <Volume2 className="h-4 w-4 shrink-0" /> : <VolumeX className="h-4 w-4 shrink-0" />}
+              {audioNeedsGesture && (
+                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-amber-300" />
+              )}
+            </button>
+
+            {playlist.length > 0 && (
+              <button
+                type="button"
+                data-sound-toggle="true"
+                onClick={() => {
+                  setCannonPopoverOpen(false);
+                  setMusicPopoverOpen((o) => !o);
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-r-full border-l px-2.5 py-2 text-xs transition ${
+                  soundOn
+                    ? 'border-amber-200/20 text-amber-100/95 hover:bg-amber-300/15 hover:text-amber-50'
+                    : 'border-white/15 text-slate-200 hover:bg-white/10 hover:text-white'
+                }`}
+                aria-label={dict.hud.chooseTrack}
+                title={dict.hud.chooseTrack}
+              >
+                <ListMusic className="h-3.5 w-3.5 shrink-0 text-amber-300" />
+                <span className="hidden max-w-[104px] truncate text-[11px] sm:inline">
+                  {currentTrackTitle || dict.hud.chooseTrack}
+                </span>
+                <ChevronDown
+                  className={`h-3 w-3 shrink-0 opacity-75 transition-transform ${
+                    musicPopoverOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+            )}
+          </div>
 
           <button
             type="button"
@@ -431,6 +603,115 @@ export default function StarlightExperience() {
           </button>
         </div>
       </header>
+
+      {/* Winter Playlist / Song Selector Popover */}
+      {musicPopoverOpen && (
+        <div
+          data-sound-toggle="true"
+          className="fixed right-4 top-20 z-30 w-72 rounded-2xl border border-amber-200/30 bg-[#0a1738]/92 p-4 text-slate-100 shadow-2xl backdrop-blur-xl sm:right-6"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className="flex items-center gap-1.5 text-xs font-semibold text-amber-200">
+                <Music2 className="h-4 w-4 text-amber-300" />
+                {dict.hud.playlistTitle}
+              </h3>
+              <p className="mt-0.5 text-[11px] text-slate-300/85">
+                {dict.hud.playlistDesc}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMusicPopoverOpen(false)}
+              className="rounded-full p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+              aria-label={dict.detail.close}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {audioNeedsGesture && (
+            <p className="mt-2 rounded-lg border border-amber-300/25 bg-amber-300/10 px-2.5 py-1.5 text-[11px] text-amber-100/90">
+              {dict.hud.tapForSound}
+            </p>
+          )}
+
+          <ul className="mt-3 max-h-52 space-y-1.5 overflow-y-auto pr-0.5">
+            {playlist.map((track, idx) => {
+              const isCurrent = idx === currentTrackIndex;
+              return (
+                <li key={track.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTrack(idx)}
+                    className={`flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left text-xs transition ${
+                      isCurrent && soundOn
+                        ? 'border-amber-300/45 bg-amber-300/15 text-amber-50'
+                        : 'border-white/10 bg-white/[0.03] text-slate-200 hover:border-amber-200/30 hover:bg-white/[0.07]'
+                    }`}
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="font-mono text-[10px] text-amber-200/70">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span className="truncate font-medium">{track.title}</span>
+                    </span>
+                    {isCurrent && soundOn && (
+                      <Volume2 className="h-3.5 w-3.5 shrink-0 text-amber-300" />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mt-3 flex items-center justify-between gap-1.5 border-t border-white/10 pt-3">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handlePrevTrack}
+                className="inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-200/40 hover:text-amber-100"
+                title={dict.hud.prevTrack}
+                aria-label={dict.hud.prevTrack}
+              >
+                <SkipBack className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextTrack}
+                className="inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-200/40 hover:text-amber-100"
+                title={dict.hud.nextTrack}
+                aria-label={dict.hud.nextTrack}
+              >
+                <SkipForward className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCyclePlayMode}
+              className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-[11px] text-slate-200 transition hover:border-amber-200/40 hover:text-amber-100"
+            >
+              {playMode === 'loop-one' ? (
+                <>
+                  <Repeat1 className="h-3.5 w-3.5 text-amber-300" />
+                  {dict.hud.playModeLoopOne}
+                </>
+              ) : playMode === 'shuffle' ? (
+                <>
+                  <Shuffle className="h-3.5 w-3.5 text-amber-300" />
+                  {dict.hud.playModeShuffle}
+                </>
+              ) : (
+                <>
+                  <Repeat className="h-3.5 w-3.5 text-amber-300" />
+                  {dict.hud.playModeLoopAll}
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Local Midnight Firework Countdown Popover */}
       {cannonPopoverOpen && (

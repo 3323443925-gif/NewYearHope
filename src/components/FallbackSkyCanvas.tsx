@@ -23,15 +23,51 @@ interface LanternNode2D {
   radius: number;
 }
 
-interface Spark2D {
+interface Rocket2D {
   x: number;
   y: number;
   vx: number;
   vy: number;
+  targetY: number;
+  palette: string[];
+  style: 'chrysanthemum' | 'willow' | 'double';
+}
+
+interface Spark2D {
+  x: number;
+  y: number;
+  px: number;
+  py: number;
+  vx: number;
+  vy: number;
   life: number;
   maxLife: number;
+  drag: number;
+  gravity: number;
+  color: string;
+  size: number;
+  isStar: boolean;
+  twinkle: boolean;
+  phase: number;
+}
+
+interface Flash2D {
+  x: number;
+  y: number;
+  life: number;
+  maxLife: number;
+  radius: number;
   color: string;
 }
+
+const PALETTES_2D: string[][] = [
+  ['#FFE49C', '#FFB852', '#FFF8DC'],
+  ['#7FD4FF', '#B8E8FF', '#FFF3CF'],
+  ['#FF7CA8', '#FFC196', '#FFF0F7'],
+  ['#C59CFF', '#7DD8FF', '#FFF1C7'],
+  ['#6CF0C4', '#99E0FF', '#FFF6D4'],
+  ['#FF6868', '#FFC566', '#FFF5D6'],
+];
 
 /**
  * Lightweight 2D Canvas night sky fallback for devices without WebGL,
@@ -47,26 +83,116 @@ export default function FallbackSkyCanvas({
 }: FallbackSkyCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const nodesRef = useRef<LanternNode2D[]>([]);
+  const rocketsRef = useRef<Rocket2D[]>([]);
   const sparksRef = useRef<Spark2D[]>([]);
+  const flashesRef = useRef<Flash2D[]>([]);
   const lastDayKeyRef = useRef<string>(getLocalDayClock(getClockDate()).dayKey);
 
-  const spawnBurst = (w: number, h: number) => {
-    ambientAudio.playBoom(0.6);
-    const cx = w * (0.18 + Math.random() * 0.64);
-    const cy = h * (0.14 + Math.random() * 0.3);
-    const colors = ['#FFE49C', '#FF9E57', '#8CD8FF', '#FF8CB8', '#C8A8FF'];
-    for (let i = 0; i < 64; i++) {
-      const a = (Math.PI * 2 * i) / 64 + Math.random() * 0.2;
-      const spd = 1.4 + Math.random() * 4.4;
+  const launchShell2D = (w: number, h: number) => {
+    const startX = w / 2 + 54;
+    const startY = h * 0.62 + 16;
+    const targetX = w * (0.18 + Math.random() * 0.64);
+    const targetY = h * (0.13 + Math.random() * 0.25);
+    const frames = 36 + Math.random() * 14;
+    const g = 0.085;
+    const styles: Array<'chrysanthemum' | 'willow' | 'double'> = [
+      'chrysanthemum',
+      'willow',
+      'double',
+    ];
+    rocketsRef.current.push({
+      x: startX,
+      y: startY,
+      vx: (targetX - startX) / frames,
+      vy: (targetY - startY - 0.5 * g * frames * frames) / frames,
+      targetY,
+      palette: PALETTES_2D[Math.floor(Math.random() * PALETTES_2D.length)],
+      style: styles[Math.floor(Math.random() * styles.length)],
+    });
+  };
+
+  const detonate2D = (cx: number, cy: number, palette: string[], style: Rocket2D['style']) => {
+    ambientAudio.playBoom(style === 'willow' ? 0.85 : 0.65);
+
+    flashesRef.current.push({
+      x: cx,
+      y: cy,
+      life: 0,
+      maxLife: 12,
+      radius: 42,
+      color: palette[0],
+    });
+
+    // Core flash-powder micro-sparks
+    for (let i = 0; i < 26; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const spd = 1.2 + Math.random() * 4.2;
       sparksRef.current.push({
         x: cx,
         y: cy,
+        px: cx,
+        py: cy,
         vx: Math.cos(a) * spd,
         vy: Math.sin(a) * spd,
         life: 0,
-        maxLife: 52 + Math.random() * 38,
-        color: colors[i % colors.length],
+        maxLife: 14 + Math.random() * 14,
+        drag: 0.91,
+        gravity: 0.04,
+        color: '#FFF9E6',
+        size: 1.4 + Math.random() * 1.1,
+        isStar: false,
+        twinkle: true,
+        phase: Math.random() * Math.PI * 2,
       });
+    }
+
+    const isWillow = style === 'willow';
+    const count = isWillow ? 64 : style === 'double' ? 58 : 74;
+    for (let i = 0; i < count; i++) {
+      const a = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.14;
+      const baseSpd = isWillow ? 4.4 : 5.4;
+      const spd = baseSpd * (0.86 + Math.random() * 0.28);
+      sparksRef.current.push({
+        x: cx,
+        y: cy,
+        px: cx,
+        py: cy,
+        vx: Math.cos(a) * spd,
+        vy: Math.sin(a) * spd,
+        life: 0,
+        maxLife: (isWillow ? 76 : 54) + Math.random() * 34,
+        drag: isWillow ? 0.962 : 0.954,
+        gravity: isWillow ? 0.072 : 0.052,
+        color: isWillow ? (i % 2 === 0 ? '#FFE299' : '#FFB34D') : palette[i % palette.length],
+        size: isWillow ? 2.1 : 2.3,
+        isStar: true,
+        twinkle: i % 3 === 0,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+
+    if (style === 'double') {
+      for (let i = 0; i < 32; i++) {
+        const a = (Math.PI * 2 * i) / 32 + (Math.random() - 0.5) * 0.16;
+        const spd = 2.7 * (0.88 + Math.random() * 0.24);
+        sparksRef.current.push({
+          x: cx,
+          y: cy,
+          px: cx,
+          py: cy,
+          vx: Math.cos(a) * spd,
+          vy: Math.sin(a) * spd,
+          life: 0,
+          maxLife: 42 + Math.random() * 20,
+          drag: 0.955,
+          gravity: 0.045,
+          color: palette[2],
+          size: 1.9,
+          isStar: true,
+          twinkle: true,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
     }
   };
 
@@ -75,11 +201,11 @@ export default function FallbackSkyCanvas({
     if (!canvas || sparkSignal === 0) return;
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    spawnBurst(w, h);
-    const t1 = setTimeout(() => spawnBurst(w, h), 280);
-    const t2 = setTimeout(() => spawnBurst(w, h), 620);
-    const t3 = setTimeout(() => spawnBurst(w, h), 980);
-    const t4 = setTimeout(() => spawnBurst(w, h), 1350);
+    launchShell2D(w, h);
+    const t1 = setTimeout(() => launchShell2D(w, h), 300);
+    const t2 = setTimeout(() => launchShell2D(w, h), 650);
+    const t3 = setTimeout(() => launchShell2D(w, h), 1020);
+    const t4 = setTimeout(() => launchShell2D(w, h), 1400);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -114,7 +240,7 @@ export default function FallbackSkyCanvas({
     let tick = 0;
 
     const stars = Array.from({ length: 110 }, (_, i) => ({
-      x: (Math.sin(i * 19.3) * 0.5 + 0.5),
+      x: Math.sin(i * 19.3) * 0.5 + 0.5,
       y: (Math.cos(i * 7.7) * 0.5 + 0.5) * 0.85,
       r: 0.7 + (i % 3) * 0.65,
       phase: i * 0.7,
@@ -187,8 +313,9 @@ export default function FallbackSkyCanvas({
       const dayClock = getLocalDayClock(getClockDate());
       if (dayClock.dayKey !== lastDayKeyRef.current) {
         lastDayKeyRef.current = dayClock.dayKey;
-        spawnBurst(w, h);
-        setTimeout(() => spawnBurst(w, h), 550);
+        launchShell2D(w, h);
+        setTimeout(() => launchShell2D(w, h), 450);
+        setTimeout(() => launchShell2D(w, h), 900);
       }
       const fuseX0 = cx + 18;
       const fuseX1 = cx + 76;
@@ -238,25 +365,140 @@ export default function FallbackSkyCanvas({
         }
       }
 
-      // 2D firework sparks
-      for (let i = sparksRef.current.length - 1; i >= 0; i--) {
-        const sp = sparksRef.current[i];
-        sp.life += 1;
-        if (sp.life >= sp.maxLife) {
-          sparksRef.current.splice(i, 1);
+      // Additive pyrotechnic rendering for realistic glowing sparks
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+
+      // Ascending shells shedding golden sparks
+      for (let i = rocketsRef.current.length - 1; i >= 0; i--) {
+        const r = rocketsRef.current[i];
+        r.vy += 0.085;
+        r.x += r.vx;
+        r.y += r.vy;
+
+        // Shed exhaust sparks
+        for (let k = 0; k < 2; k++) {
+          sparksRef.current.push({
+            x: r.x,
+            y: r.y,
+            px: r.x,
+            py: r.y,
+            vx: r.vx * 0.1 + (Math.random() - 0.5) * 0.8,
+            vy: 0.6 + Math.random() * 1.1,
+            life: 0,
+            maxLife: 16 + Math.random() * 14,
+            drag: 0.94,
+            gravity: 0.05,
+            color: '#FFD07A',
+            size: 1.3,
+            isStar: false,
+            twinkle: true,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+
+        ctx.fillStyle = '#FFF6D6';
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, 2.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (r.y <= r.targetY || r.vy >= 0) {
+          detonate2D(r.x, r.y, r.palette, r.style);
+          rocketsRef.current.splice(i, 1);
+        }
+      }
+
+      // Core incandescent flashes
+      for (let i = flashesRef.current.length - 1; i >= 0; i--) {
+        const fl = flashesRef.current[i];
+        fl.life += 1;
+        if (fl.life >= fl.maxLife) {
+          flashesRef.current.splice(i, 1);
           continue;
         }
-        sp.vx *= 0.97;
-        sp.vy = sp.vy * 0.97 + 0.045;
+        const p = fl.life / fl.maxLife;
+        const rad = fl.radius * (0.4 + 0.8 * p);
+        const grad = ctx.createRadialGradient(fl.x, fl.y, 0, fl.x, fl.y, rad);
+        grad.addColorStop(0, `rgba(255, 250, 232, ${(0.85 * (1 - p)).toFixed(2)})`);
+        grad.addColorStop(0.5, `rgba(255, 212, 130, ${(0.3 * (1 - p)).toFixed(2)})`);
+        grad.addColorStop(1, 'rgba(255, 212, 130, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(fl.x, fl.y, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 2D firework stars & shed micro-sparks with glowing trails
+      const sparks = sparksRef.current;
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const sp = sparks[i];
+        sp.life += 1;
+        if (sp.life >= sp.maxLife) {
+          sparks.splice(i, 1);
+          continue;
+        }
+        sp.px = sp.x;
+        sp.py = sp.y;
+        sp.vx *= sp.drag;
+        sp.vy = sp.vy * sp.drag + sp.gravity;
         sp.x += sp.vx;
         sp.y += sp.vy;
-        ctx.globalAlpha = Math.max(0, 1 - sp.life / sp.maxLife);
+
+        const progress = sp.life / sp.maxLife;
+
+        // Primary burning stars shed fine trailing micro-sparks
+        if (sp.isStar && progress < 0.85 && sparks.length < 950 && Math.random() < 0.45) {
+          sparks.push({
+            x: sp.x,
+            y: sp.y,
+            px: sp.px,
+            py: sp.py,
+            vx: sp.vx * 0.2 + (Math.random() - 0.5) * 0.5,
+            vy: sp.vy * 0.2 + (Math.random() - 0.5) * 0.5,
+            life: 0,
+            maxLife: 14 + Math.random() * 14,
+            drag: 0.92,
+            gravity: 0.035,
+            color: '#FFC46B',
+            size: 1.15,
+            isStar: false,
+            twinkle: true,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+
+        const fade = Math.pow(Math.max(0, 1 - progress), 1.35);
+        const flicker = sp.twinkle
+          ? 0.55 + 0.45 * Math.sin(tick * 42 + sp.phase * 6)
+          : 1;
+        const alpha = fade * flicker;
+
+        // Glowing spark tail streak
+        ctx.globalAlpha = alpha * (sp.isStar ? 0.72 : 0.45);
+        ctx.strokeStyle = sp.color;
+        ctx.lineWidth = sp.isStar ? 1.5 : 0.9;
+        ctx.beginPath();
+        ctx.moveTo(sp.x, sp.y);
+        ctx.lineTo(sp.x - (sp.x - sp.px) * 3.2, sp.y - (sp.y - sp.py) * 3.2);
+        ctx.stroke();
+
+        // Incandescent pinpoint core + colored halo
+        ctx.globalAlpha = alpha;
         ctx.fillStyle = sp.color;
         ctx.beginPath();
-        ctx.arc(sp.x, sp.y, 2.4, 0, Math.PI * 2);
+        ctx.arc(sp.x, sp.y, sp.size * (1 - progress * 0.45), 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1;
+
+        if (sp.isStar && progress < 0.7) {
+          ctx.globalAlpha = alpha * 0.9;
+          ctx.fillStyle = '#FFFDF5';
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, sp.size * 0.48, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
+
+      ctx.restore();
     };
 
     render();
